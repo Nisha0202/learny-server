@@ -57,6 +57,7 @@ async function run() {
       }
     });
 
+    //booked
     app.post('/api/bookedSession', async (req, res) => {
       const { sessionId, userEmail, tutorEmail } = req.body;
       const session = await sessionCollection.findOne({ _id: new ObjectId(sessionId) });
@@ -73,6 +74,21 @@ async function run() {
       await bookedSessionCollection.insertOne(bookedSession);
       res.status(200).json({ message: 'Session booked successfully' });
     });
+
+
+    //find booked session
+    app.get('/api/bookedSession', async (req, res) => {
+      const { userEmail } = req.query;
+    
+      try {
+        const bookedSessions = await bookedSessionCollection.find({ userEmail }).toArray();
+        res.status(200).json(bookedSessions);
+      } catch (error) {
+        console.error('Error fetching booked sessions:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+    
 
 
     app.post('/api/users', async (req, res) => {
