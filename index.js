@@ -316,6 +316,13 @@ app.delete('/api/materials/:id', async (req, res) => {
   res.status(200).json({ message: 'Material deleted successfully' });
 });
 
+app.get('/api/materials/:tutorEmail', async (req, res) => {
+  const { tutorEmail } = req.params;
+  const materials = await materialsCollection.find({ tutorEmail }).toArray();
+  res.status(200).json(materials);
+});
+
+
 
 
 
