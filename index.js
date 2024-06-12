@@ -7,8 +7,8 @@ const jwt = require('jsonwebtoken');
 
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const ObjectId = require('mongodb').ObjectId;
-
+// const ObjectId = require('mongodb').ObjectId;
+const { ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.S3_BUCKET}:${process.env.SECRET_KEY}@cluster0.5cua0xk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 const bcrypt = require('bcrypt');
@@ -203,26 +203,14 @@ async function run() {
     }
 });
 
-// Fetch all notes for a user
-// app.get('/api/notes', (req, res) => {
-//   const userEmail = req.query.userEmail;
-//   console.log(userEmail);
-//   notesCollection.find({ userEmail: userEmail }).toArray()
-//       .then(notes => {
-//           res.json(notes);
-//       })
-//       .catch(err => {
-//           console.error(err);
-//           res.status(500).json({ message: 'Server Error' });
-//       });
-// });
+
 
 // Update a note
 app.put('/api/notes/:id', async (req, res) => {
   const { title, description } = req.body;
   const { id } = req.params;
   try {
-      await notesCollection.updateOne({ _id: ObjectId(id) }, { $set: { title, description } });
+      await notesCollection.updateOne({ _id: new ObjectId(id) }, { $set: { title, description } });
       res.status(200).json({ message: 'Note updated successfully' });
   } catch (error) {
       console.error('Error updating note:', error);
@@ -230,10 +218,10 @@ app.put('/api/notes/:id', async (req, res) => {
   }
 });
 
+
 //fetch
 app.get('/api/notes', async (req, res) => {
   const userEmail = req.query.userEmail;
-  console.log(userEmail);
 
   try {
     const notes = await notesCollection.find({ userEmail: userEmail }).toArray();
@@ -249,7 +237,7 @@ app.get('/api/notes', async (req, res) => {
 app.delete('/api/notes/:id', async (req, res) => {
   const { id } = req.params;
   try {
-      await notesCollection.deleteOne({ _id: ObjectId(id) });
+      await notesCollection.deleteOne({ _id: new ObjectId(id) });
       res.status(200).json({ message: 'Note deleted successfully' });
   } catch (error) {
       console.error('Error deleting note:', error);
