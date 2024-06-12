@@ -245,63 +245,7 @@ app.delete('/api/notes/:id', async (req, res) => {
   }
 });
 
-    
-//teacher request
-// app.get('/api/session/:tutorEmail', async (req, res) => {
-//   try {
-//     const { tutorEmail } = req.params;
-//     let sessions;
-//     if (tutorEmail) {
-//       sessions = await sessionCollection.find({ tutorEmail }).toArray();
-//     } else {
-//       sessions = await sessionCollection.find().toArray();
-//     }
-//     res.status(200).json(sessions);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// // });
-// app.get('/api/session/:tutorEmail', async (req, res) => {
-//   try {
-//     const { tutorEmail } = req.params;
-//     const trimmedEmail = tutorEmail.trim(); // Trim any extra characters
-//     let sessions;
 
-//     if (trimmedEmail) {
-//       sessions = await sessionCollection.find({ tutorEmail: trimmedEmail }).toArray();
-//     } else {
-//       sessions = await sessionCollection.find().toArray();
-//     }
-
-//     res.status(200).json(sessions);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
-
-
-// app.post('/api/session/:id/:tutorEmail/request-approval', async (req, res) => {
-//   try {
-//     const { id, tutorEmail } = req.params;
-
-//     // Check if id is a valid ObjectId
-//     if (!ObjectId.isValid(id)) {
-//       return res.status(400).json({ message: 'Invalid session id' });
-//     }
-
-//     const session = await sessionCollection.findOne({ _id: new ObjectId(id), tutorEmail });
-//     if (!session) {
-//       return res.status(404).json({ message: 'Session not found' });
-//     }
-//     await sessionCollection.updateOne({ _id: ObjectId(id) }, { $set: { status: 'pending' } });
-//     res.status(200).json({ message: 'Approval request sent' });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
 
 
 app.get('/api/session/tutor/:tutorEmail', async (req, res) => {
@@ -322,7 +266,7 @@ app.post('/api/session/:id/request-approval', async (req, res) => {
     if (!session) {
       return res.status(404).json({ message: 'Session not found' });
     }
-    await sessionCollection.updateOne({ _id: ObjectId(id) }, { $set: { status: 'pending' } });
+    await sessionCollection.updateOne({ _id: new ObjectId(id) }, { $set: { status: 'pending' } });
     res.status(200).json({ message: 'Approval request sent' });
   } catch (error) {
     console.error(error);
