@@ -30,11 +30,14 @@ async function run() {
     // await client.connect();
     console.log("Successfully connected to MongoDB!");
 
+    //collections
     const database = client.db('learny');
     const sessionCollection = database.collection('session');
     const bookedSessionCollection = database.collection('bookedSession');
     const usersCollection = database.collection('userInfo');
     const reviewsCollection = database.collection('reviews'); 
+    const notesCollection = database.collection('notes'); 
+
 
     app.get('/api/session', async (req, res) => {
       try {
@@ -168,6 +171,8 @@ async function run() {
     //   }
     // });
 
+
+    //add review
     app.post('/api/review', async (req, res) => {
       const { sessionId, userEmail, userName, review, rating } = req.body;
       try {
@@ -181,6 +186,77 @@ async function run() {
           res.status(500).json({ message: 'Error submitting review' });
       }
   });
+
+
+  //create notes
+  app.post('/api/notes', async (req, res) => {
+    const { userEmail, title, description } = req.body;
+    try {
+        // Insert the new note into the database
+        const result = await notesCollection.insertOne({ userEmail, title, description });
+        // Send a success response
+        res.status(200).json({ message: 'Note created successfully', noteId: result.insertedId });
+    } catch (error) {
+        // Send an error response
+        console.error('Error creating note:', error);
+        res.status(500).json({ message: 'Error creating note' });
+    }
+});
+
+// Fetch all notes for a user
+// app.get('/api/notes', (req, res) => {
+//   const userEmail = req.query.userEmail;
+//   console.log(userEmail);
+//   notesCollection.find({ userEmail: userEmail }).toArray()
+//       .then(notes => {
+//           res.json(notes);
+//       })
+//       .catch(err => {
+//           console.error(err);
+//           res.status(500).json({ message: 'Server Error' });
+//       });
+// });
+
+// Update a note
+app.put('/api/notes/:id', async (req, res) => {
+  const { title, description } = req.body;
+  const { id } = req.params;
+  try {
+      await notesCollection.updateOne({ _id: ObjectId(id) }, { $set: { title, description } });
+      res.status(200).json({ message: 'Note updated successfully' });
+  } catch (error) {
+      console.error('Error updating note:', error);
+      res.status(500).json({ message: 'Error updating note' });
+  }
+});
+
+//fetch
+app.get('/api/notes', async (req, res) => {
+  const userEmail = req.query.userEmail;
+  console.log(userEmail);
+
+  try {
+    const notes = await notesCollection.find({ userEmail: userEmail }).toArray();
+    res.json(notes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+
+// Delete a note
+app.delete('/api/notes/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+      await notesCollection.deleteOne({ _id: ObjectId(id) });
+      res.status(200).json({ message: 'Note deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting note:', error);
+      res.status(500).json({ message: 'Error deleting note' });
+  }
+});
+
     
     
 
