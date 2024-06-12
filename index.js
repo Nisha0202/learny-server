@@ -34,6 +34,7 @@ async function run() {
     const sessionCollection = database.collection('session');
     const bookedSessionCollection = database.collection('bookedSession');
     const usersCollection = database.collection('userInfo');
+    const reviewsCollection = database.collection('reviews'); 
 
     app.get('/api/session', async (req, res) => {
       try {
@@ -143,6 +144,44 @@ async function run() {
         res.status(500).json({ error: error.message });
       }
     });
+
+
+
+    //post review
+    // app.post('/api/session/:id/review', async (req, res) => {
+    //   const { id } = req.params;
+    //   const { review, rating } = req.body;
+    //   try {
+    //     // Find the session with the given ID
+    //     const session = await sessionCollection.findOne({ _id: new ObjectId(id) });
+    //     if (!session) {
+    //       return res.status(404).json({ message: 'Session not found' });
+    //     }
+    //     // Add the new review to the session's reviews array
+    //     session.reviews.push({ studentName: usern.username, review, rating });
+    //     // Update the session in the database
+    //     await sessionCollection.updateOne({ _id: new ObjectId(id) }, { $set: { reviews: session.reviews } });
+    //     res.status(200).json({ message: 'Review added successfully' });
+    //   } catch (error) {
+    //     console.error('Error adding review:', error);
+    //     res.status(500).json({ message: 'Server error' });
+    //   }
+    // });
+
+    app.post('/api/review', async (req, res) => {
+      const { sessionId, userEmail, userName, review, rating } = req.body;
+      try {
+          // Insert the new review into the database
+          const result = await reviewsCollection.insertOne({ sessionId, userEmail, userName, review, rating });
+          // Send a success response
+          res.status(200).json({ message: 'Review submitted successfully', reviewId: result.insertedId });
+      } catch (error) {
+          // Send an error response
+          console.error('Error submitting review:', error);
+          res.status(500).json({ message: 'Error submitting review' });
+      }
+  });
+    
     
 
 
