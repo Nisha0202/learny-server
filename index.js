@@ -275,7 +275,7 @@ app.post('/api/session/:id/request-approval', async (req, res) => {
   }
 });
 
-
+//materials
 app.post('/api/materials', async (req, res) => {
   try {
     const { title, sessionId, tutorEmail, image, link } = req.body;
@@ -296,6 +296,24 @@ app.post('/api/materials', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Failed to upload material' });
   }
+});
+
+app.get('/api/materials', async (req, res) => {
+  const materials = await materialsCollection.find().toArray();
+  res.status(200).json(materials);
+});
+
+app.put('/api/materials/:id', async (req, res) => {
+  const { id } = req.params;
+  const updatedMaterial = req.body;
+  await materialsCollection.updateOne({ _id: new ObjectId(id) }, { $set: updatedMaterial });
+  res.status(200).json({ message: 'Material updated successfully' });
+});
+
+app.delete('/api/materials/:id', async (req, res) => {
+  const { id } = req.params;
+  await materialsCollection.deleteOne({ _id: new ObjectId(id) });
+  res.status(200).json({ message: 'Material deleted successfully' });
 });
 
 
