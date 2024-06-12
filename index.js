@@ -32,7 +32,7 @@ async function run() {
 
     //collections
     const database = client.db('learny');
-    const sessionCollection = database.collection('session');
+    const sessionCollection = database.collection('sessions');
     const bookedSessionCollection = database.collection('bookedSession');
     const usersCollection = database.collection('userInfo');
     const reviewsCollection = database.collection('reviews'); 
@@ -160,29 +160,17 @@ app.post('/api/session', async (req, res) => {
       }
     });
 
-
-
-    //post review
-    // app.post('/api/session/:id/review', async (req, res) => {
-    //   const { id } = req.params;
-    //   const { review, rating } = req.body;
-    //   try {
-    //     // Find the session with the given ID
-    //     const session = await sessionCollection.findOne({ _id: new ObjectId(id) });
-    //     if (!session) {
-    //       return res.status(404).json({ message: 'Session not found' });
-    //     }
-    //     // Add the new review to the session's reviews array
-    //     session.reviews.push({ studentName: usern.username, review, rating });
-    //     // Update the session in the database
-    //     await sessionCollection.updateOne({ _id: new ObjectId(id) }, { $set: { reviews: session.reviews } });
-    //     res.status(200).json({ message: 'Review added successfully' });
-    //   } catch (error) {
-    //     console.error('Error adding review:', error);
-    //     res.status(500).json({ message: 'Server error' });
-    //   }
-    // });
-
+    app.get('/api/review/:id', async (req, res) => {
+      const { id } = req.params;
+      try {
+        const reviews = await reviewsCollection.find({ sessionId: id }).toArray();
+        res.status(200).json(reviews);
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        res.status(500).json({ message: 'Error fetching reviews' });
+      }
+    });
+    
 
     //add review
     app.post('/api/review', async (req, res) => {
@@ -258,7 +246,90 @@ app.delete('/api/notes/:id', async (req, res) => {
 });
 
     
-    
+//teacher request
+// app.get('/api/session/:tutorEmail', async (req, res) => {
+//   try {
+//     const { tutorEmail } = req.params;
+//     let sessions;
+//     if (tutorEmail) {
+//       sessions = await sessionCollection.find({ tutorEmail }).toArray();
+//     } else {
+//       sessions = await sessionCollection.find().toArray();
+//     }
+//     res.status(200).json(sessions);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// // });
+// app.get('/api/session/:tutorEmail', async (req, res) => {
+//   try {
+//     const { tutorEmail } = req.params;
+//     const trimmedEmail = tutorEmail.trim(); // Trim any extra characters
+//     let sessions;
+
+//     if (trimmedEmail) {
+//       sessions = await sessionCollection.find({ tutorEmail: trimmedEmail }).toArray();
+//     } else {
+//       sessions = await sessionCollection.find().toArray();
+//     }
+
+//     res.status(200).json(sessions);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+
+
+// app.post('/api/session/:id/:tutorEmail/request-approval', async (req, res) => {
+//   try {
+//     const { id, tutorEmail } = req.params;
+
+//     // Check if id is a valid ObjectId
+//     if (!ObjectId.isValid(id)) {
+//       return res.status(400).json({ message: 'Invalid session id' });
+//     }
+
+//     const session = await sessionCollection.findOne({ _id: new ObjectId(id), tutorEmail });
+//     if (!session) {
+//       return res.status(404).json({ message: 'Session not found' });
+//     }
+//     await sessionCollection.updateOne({ _id: ObjectId(id) }, { $set: { status: 'pending' } });
+//     res.status(200).json({ message: 'Approval request sent' });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+
+
+app.get('/api/session/tutor/:tutorEmail', async (req, res) => {
+  try {
+    const { tutorEmail } = req.params; // Get the tutorEmail from the route parameters
+    const sessions = await sessionCollection.find({ tutorEmail }).toArray();
+    res.status(200).json(sessions);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.post('/api/session/:id/request-approval', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const session = await sessionCollection.findOne({ _id: new ObjectId(id) });
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+    await sessionCollection.updateOne({ _id: ObjectId(id) }, { $set: { status: 'pending' } });
+    res.status(200).json({ message: 'Approval request sent' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 
 
