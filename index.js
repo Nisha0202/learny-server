@@ -37,6 +37,7 @@ async function run() {
     const usersCollection = database.collection('userInfo');
     const reviewsCollection = database.collection('reviews'); 
     const notesCollection = database.collection('notes'); 
+    const materialsCollection = database.collection('materials');
 
     // Create a session
 app.post('/api/session', async (req, res) => {
@@ -247,7 +248,7 @@ app.delete('/api/notes/:id', async (req, res) => {
 
 
 
-
+//teacher
 app.get('/api/session/tutor/:tutorEmail', async (req, res) => {
   try {
     const { tutorEmail } = req.params; // Get the tutorEmail from the route parameters
@@ -273,6 +274,30 @@ app.post('/api/session/:id/request-approval', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
+app.post('/api/materials', async (req, res) => {
+  try {
+    const { title, sessionId, tutorEmail, image, link } = req.body;
+
+    // Create the material object
+    const material = {
+      title,
+      sessionId,
+      tutorEmail,
+      image,
+      link,
+    };
+
+   await materialsCollection.insertOne(material);
+
+    res.status(200).json({ message: 'Material uploaded successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to upload material' });
+  }
+});
+
 
 
 
