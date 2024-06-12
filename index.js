@@ -38,7 +38,19 @@ async function run() {
     const reviewsCollection = database.collection('reviews'); 
     const notesCollection = database.collection('notes'); 
 
+    // Create a session
+app.post('/api/session', async (req, res) => {
+  const sessionData = req.body;
+  try {
+      await sessionCollection.insertOne(sessionData);
+      res.status(200).json({ message: 'Session created successfully' });
+  } catch (error) {
+      console.error('Error creating session:', error);
+      res.status(500).json({ message: 'Error creating session' });
+  }
+});
 
+//get allsession
     app.get('/api/session', async (req, res) => {
       try {
         const sessions = await sessionCollection.find().toArray();
