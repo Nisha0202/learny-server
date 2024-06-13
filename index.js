@@ -324,15 +324,27 @@ app.get('/api/materials/:tutorEmail', async (req, res) => {
 
 
 // show booked session material for student 
+// app.get('/api/material/:sessionId', async (req, res) => {
+//   const { sessionId } = req.params;
+//   try {
+//     const materials = await materialsCollection.find({ sessionId: sessionId }).toArray();
+//     res.status(200).json(materials);
+//   } catch (err) {
+//     res.status(500).send(err);
+//   }
+// });
 app.get('/api/material/:sessionId', async (req, res) => {
   const { sessionId } = req.params;
   try {
+    console.log(`Fetching materials for sessionId: ${sessionId}`); // Add logging
     const materials = await materialsCollection.find({ sessionId: sessionId }).toArray();
     res.status(200).json(materials);
   } catch (err) {
+    console.error(`Error fetching materials for sessionId: ${sessionId}`, err); // Add logging
     res.status(500).send(err);
   }
 });
+
 
 
 
