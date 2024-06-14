@@ -112,7 +112,7 @@ app.post('/api/session', async (req, res) => {
       const { email, pass, username, image, role } = req.body;
     
       // Check if the user is trying to register as an admin
-      if (role === 'admin' && (email !== 'admin@gmail.com' || pass !== 'Admin')) {
+      if (role === 'admin' && (email !== 'admin@gmail.com' || pass !== 'Adminn')) {
         return res.status(400).json({ message: 'Cannot register as Admin' });
       }
       const existingUser = await usersCollection.findOne({ email });
@@ -123,7 +123,6 @@ app.post('/api/session', async (req, res) => {
       try {
         // Hash the password
         const hashedPassword = await bcrypt.hash(pass, saltRounds);
-    
         const user = { email, pass: hashedPassword, username, image, role };
         const result = await usersCollection.insertOne(user);
         res.status(200).json({ message: 'User created successfully', userId: result.insertedId });
@@ -132,6 +131,32 @@ app.post('/api/session', async (req, res) => {
         res.status(500).json({ error: error.message });
       }
     });
+
+    //get all user
+    app.get('/api/users', async (req, res) => {
+      try {
+        const users = await usersCollection.find({}).toArray();
+        res.json(users);
+      } catch (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).send(err);
+      }
+    });
+
+
+    app.put('/api/users/:userId', async (req, res) => {
+      const { userId } = req.params;
+      const { role } = req.body;
+    
+      try {
+        const user = await usersCollection.findByIdAndUpdate(userId, { role }, { new: true });
+        res.json(user);
+      } catch (err) {
+        console.error('Error updating user role:', err);
+        res.status(500).send(err);
+      }
+    });
+    
     
 
     app.post('/api/login', async (req, res) => {
@@ -323,16 +348,6 @@ app.get('/api/materials/:tutorEmail', async (req, res) => {
 });
 
 
-// show booked session material for student 
-// app.get('/api/material/:sessionId', async (req, res) => {
-//   const { sessionId } = req.params;
-//   try {
-//     const materials = await materialsCollection.find({ sessionId: sessionId }).toArray();
-//     res.status(200).json(materials);
-//   } catch (err) {
-//     res.status(500).send(err);
-//   }
-// });
 app.get('/api/material/:sessionId', async (req, res) => {
   const { sessionId } = req.params;
   try {
