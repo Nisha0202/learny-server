@@ -133,15 +133,39 @@ app.post('/api/session', async (req, res) => {
     });
 
     //get all user
+    // app.get('/api/users', async (req, res) => {
+    //   try {
+    //     const users = await usersCollection.find({}).toArray();
+    //     res.json(users);
+    //   } catch (err) {
+    //     console.error('Error fetching users:', err);
+    //     res.status(500).send(err);
+    //   }
+    // });
+
     app.get('/api/users', async (req, res) => {
-      try {
-        const users = await usersCollection.find({}).toArray();
-        res.json(users);
-      } catch (err) {
-        console.error('Error fetching users:', err);
-        res.status(500).send(err);
+      const { search } = req.query;
+      let query = {};
+  
+      if (search) {
+          query = {
+              $or: [
+                  { username: new RegExp(search, 'i') },
+                  { email: new RegExp(search, 'i') }
+              ]
+          };
       }
-    });
+  
+      try {
+          const users = await usersCollection.find(query).toArray();
+          res.json(users);
+      } catch (err) {
+          console.error('Error fetching users:', err);
+          res.status(500).send(err);
+      }
+  });
+
+
     
     app.put('/api/users/:userId', async (req, res) => {
     
