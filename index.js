@@ -142,22 +142,24 @@ app.post('/api/session', async (req, res) => {
         res.status(500).send(err);
       }
     });
-
-
+    
     app.put('/api/users/:userId', async (req, res) => {
-      const { userId } = req.params;
+    
+      const userId = new ObjectId(req.params.userId); 
       const { role } = req.body;
     
       try {
-        const user = await usersCollection.findByIdAndUpdate(userId, { role }, { new: true });
+        const user = await usersCollection.findOneAndUpdate(
+          { _id: userId },
+          { $set: { role: role } },
+          { new: true }
+        );
         res.json(user);
       } catch (err) {
         console.error('Error updating user role:', err);
         res.status(500).send(err);
       }
     });
-    
-    
 
     app.post('/api/login', async (req, res) => {
       const { email, pass } = req.body;
