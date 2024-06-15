@@ -74,6 +74,67 @@ app.post('/api/session', async (req, res) => {
       }
     });
 
+
+    //approved
+  //  app.put('/api/sessions/:id', async (req, res) => {
+  //     try {
+  //         const session = await sessionCollection.findById(req.params.id);
+  //         if (!session) {
+  //             return res.status(404).send({ error: 'Session not found' });
+  //         }
+  
+  //         session.status = req.body.status;
+  //         session.registrationFee = req.body.registrationFee;
+  
+  //         await session.save();
+  
+  //         res.send(session);
+  //     } catch (error) {
+  //         console.error(error);
+  //         res.status(500).send({ error: 'Internal Server Error' });
+  //     }
+  // });
+
+
+  app.put('/api/sessions/:id', async (req, res) => {
+    try {
+        // Find the session document by its ID
+        const session = await sessionCollection.findOne({ _id: new ObjectId(req.params.id) });
+        if (!session) {
+            return res.status(404).send({ error: 'Session not found' });
+        }
+
+        // Update the document with new data
+        for (let key in req.body) {
+            session[key] = req.body[key];
+        }
+
+        // If the session is rejected, update the rejection reason and feedback
+        if (req.body.status === 'rejected') {
+            session.rejectionReason = req.body.rejectionReason;
+            session.feedback = req.body.feedback;
+        }
+
+        // If the session is approved, update the registration fee
+        if (req.body.status === 'approved') {
+            session.registrationFee = req.body.registrationFee;
+        }
+
+        // Save the updated session document
+        await sessionCollection.updateOne({ _id: new ObjectId(req.params.id) }, { $set: session });
+
+        res.send(session);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
+
+  
+
+
+
+
     //booked
     app.post('/api/bookedSession', async (req, res) => {
       const { sessionId, userEmail, tutorEmail } = req.body;
