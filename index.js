@@ -189,6 +189,7 @@ app.delete('/api/sessions/:id', async (req, res) => {
 //   }
 // });
 
+//get session on admin
 app.get('/api/sessions/:sessionId', async (req, res) => {
   try {
     const sessionId = req.params.sessionId;
@@ -203,7 +204,29 @@ app.get('/api/sessions/:sessionId', async (req, res) => {
   }
 });
 
- 
+//update session
+app.put('/api/sessions/:sessionId', async (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+    const updateData = req.body;
+    const result = await sessionCollection.updateOne(
+      { _id: new ObjectId(sessionId) },
+      { $set: updateData }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: 'Session not found or data not modified' });
+    }
+
+    res.status(200).json({ message: 'Session updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 
     //booked
     app.post('/api/bookedSession', async (req, res) => {
