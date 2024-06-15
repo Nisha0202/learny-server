@@ -162,6 +162,47 @@ app.delete('/api/sessions/:id', async (req, res) => {
   }
 });
 
+
+
+// //admin update session
+// app.get('/api/sessions/:id', (req, res) => {
+//   const sessionId = req.params.id;
+//   const session = sessionCollection.find((s) => s.id === parseInt(sessionId));
+//   if (!session) {
+//     res.status(404).json({ error: 'Session not found' });
+//   } else {
+//     res.json(session);
+//   }
+// });
+
+// // Update a session by ID
+// app.put('/api/sessions/:id', (req, res) => {
+//   const sessionId = req.params.id;
+//   const updatedSession = req.body;
+//   const session = sessionCollection.find((s) => s.id === parseInt(sessionId));
+
+//   if (session === -1) {
+//     res.status(404).json({ error: 'Session not found' });
+//   } else {
+//     sessionCollection[index] = updatedSession;
+//     res.json(updatedSession);
+//   }
+// });
+
+app.get('/api/sessions/:sessionId', async (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+    const session = await sessionCollection.findOne({ _id: new ObjectId(sessionId) });
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+    res.status(200).json(session);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
  
 
     //booked
@@ -466,10 +507,6 @@ app.get('/api/material/:sessionId', async (req, res) => {
     res.status(500).send(err);
   }
 });
-
-
-
-
 
 
   } catch (error) {
