@@ -74,66 +74,95 @@ app.post('/api/session', async (req, res) => {
       }
     });
 
+//approved or reject?
+//   app.put('/api/sessions/:id', async (req, res) => {
+//     try {
+//         // Find the session document by its ID
+//         const session = await sessionCollection.findOne({ _id: new ObjectId(req.params.id) });
+//         if (!session) {
+//             return res.status(404).send({ error: 'Session not found' });
+//         }
 
-    //approved
-  //  app.put('/api/sessions/:id', async (req, res) => {
-  //     try {
-  //         const session = await sessionCollection.findById(req.params.id);
-  //         if (!session) {
-  //             return res.status(404).send({ error: 'Session not found' });
-  //         }
-  
-  //         session.status = req.body.status;
-  //         session.registrationFee = req.body.registrationFee;
-  
-  //         await session.save();
-  
-  //         res.send(session);
-  //     } catch (error) {
-  //         console.error(error);
-  //         res.status(500).send({ error: 'Internal Server Error' });
-  //     }
-  // });
+//         // Update the document with new data
+//         for (let key in req.body) {
+//             session[key] = req.body[key];
+//         }
+
+//         // If the session is rejected, update the rejection reason and feedback
+//         if (req.body.status === 'rejected') {
+//             session.rejectionReason = req.body.rejectionReason;
+//             session.feedback = req.body.feedback;
+//         }
+
+//         // If the session is approved, update the registration fee
+//         if (req.body.status === 'approved') {
+//             session.registrationFee = req.body.registrationFee;
+//         }
+
+//         // Save the updated session document
+//         await sessionCollection.updateOne({ _id: new ObjectId(req.params.id) }, { $set: session });
+
+//         res.send(session);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send({ error: 'Internal Server Error' });
+//     }
+// });
 
 
-  app.put('/api/sessions/:id', async (req, res) => {
-    try {
-        // Find the session document by its ID
-        const session = await sessionCollection.findOne({ _id: new ObjectId(req.params.id) });
-        if (!session) {
-            return res.status(404).send({ error: 'Session not found' });
-        }
 
-        // Update the document with new data
-        for (let key in req.body) {
-            session[key] = req.body[key];
-        }
+// Update session endpoint
+app.put('/api/sessions/:id', async (req, res) => {
+  try {
+      // Find the session document by its ID
+      const session = await sessionCollection.findOne({ _id: new ObjectId(req.params.id) });
+      if (!session) {
+          return res.status(404).send({ error: 'Session not found' });
+      }
 
-        // If the session is rejected, update the rejection reason and feedback
-        if (req.body.status === 'rejected') {
-            session.rejectionReason = req.body.rejectionReason;
-            session.feedback = req.body.feedback;
-        }
+      // Update the document with new data
+      for (let key in req.body) {
+          session[key] = req.body[key];
+      }
 
-        // If the session is approved, update the registration fee
-        if (req.body.status === 'approved') {
-            session.registrationFee = req.body.registrationFee;
-        }
+      // If the session is rejected, update the rejection reason and feedback
+      if (req.body.status === 'rejected') {
+          session.rejectionReason = req.body.rejectionReason;
+          session.feedback = req.body.feedback;
+      }
 
-        // Save the updated session document
-        await sessionCollection.updateOne({ _id: new ObjectId(req.params.id) }, { $set: session });
+      // If the session is approved, update the registration fee
+      if (req.body.status === 'approved') {
+          session.registrationFee = req.body.registrationFee;
+      }
 
-        res.send(session);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Internal Server Error' });
-    }
+      // Save the updated session document
+      await sessionCollection.updateOne({ _id: new ObjectId(req.params.id) }, { $set: session });
+
+      res.send(session);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: 'Internal Server Error' });
+  }
 });
 
-  
+// Delete session endpoint
+app.delete('/api/sessions/:id', async (req, res) => {
+  try {
+      // Delete the session document by its ID
+      const result = await sessionCollection.deleteOne({ _id: new ObjectId(req.params.id) });
+      if (result.deletedCount === 0) {
+          return res.status(404).send({ error: 'Session not found' });
+      }
 
+      res.send({ message: 'Session deleted successfully' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: 'Internal Server Error' });
+  }
+});
 
-
+ 
 
     //booked
     app.post('/api/bookedSession', async (req, res) => {
@@ -194,15 +223,6 @@ app.post('/api/session', async (req, res) => {
     });
 
     //get all user
-    // app.get('/api/users', async (req, res) => {
-    //   try {
-    //     const users = await usersCollection.find({}).toArray();
-    //     res.json(users);
-    //   } catch (err) {
-    //     console.error('Error fetching users:', err);
-    //     res.status(500).send(err);
-    //   }
-    // });
 
     app.get('/api/users', async (req, res) => {
       const { search } = req.query;
