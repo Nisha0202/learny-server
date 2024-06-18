@@ -1,10 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+
+
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
-
+const stripe = require("stripe")(process.env.STRIPE);
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
 // const ObjectId = require('mongodb').ObjectId;
@@ -74,40 +76,7 @@ app.post('/api/session', async (req, res) => {
       }
     });
 
-//approved or reject?
-//   app.put('/api/sessions/:id', async (req, res) => {
-//     try {
-//         // Find the session document by its ID
-//         const session = await sessionCollection.findOne({ _id: new ObjectId(req.params.id) });
-//         if (!session) {
-//             return res.status(404).send({ error: 'Session not found' });
-//         }
 
-//         // Update the document with new data
-//         for (let key in req.body) {
-//             session[key] = req.body[key];
-//         }
-
-//         // If the session is rejected, update the rejection reason and feedback
-//         if (req.body.status === 'rejected') {
-//             session.rejectionReason = req.body.rejectionReason;
-//             session.feedback = req.body.feedback;
-//         }
-
-//         // If the session is approved, update the registration fee
-//         if (req.body.status === 'approved') {
-//             session.registrationFee = req.body.registrationFee;
-//         }
-
-//         // Save the updated session document
-//         await sessionCollection.updateOne({ _id: new ObjectId(req.params.id) }, { $set: session });
-
-//         res.send(session);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send({ error: 'Internal Server Error' });
-//     }
-// });
 
 
 
@@ -531,6 +500,53 @@ app.get('/api/material/:sessionId', async (req, res) => {
   }
 });
 
+
+//stripe
+app.post("/create-payment-intent", async (req, res) => {
+  try {
+    const price = req.body.price;
+    const priceInCent = parseFloat(price) * 100;
+
+    if (!price || priceInCent < 1) {
+      res.status(400).json({ error: 'Invalid price' });
+      return;
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: priceInCent,
+      currency: "usd",
+      automatic_payment_methods: { enabled: true },
+    });
+
+    res.send({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error("Error creating payment intent2:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// app.post("/create-payment-intent", async (req, res) => {
+//   try {
+//     const price = req.body.price;
+//     const priceInCent = parseFloat(price) * 100;
+
+//     if (!price || priceInCent < 1) {
+//       res.status(400).json({ error: 'Invalid price' });
+//       return;
+//     }
+
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: priceInCent,
+//       currency: "usd",
+//       automatic_payment_methods: { enabled: true },
+//     });
+
+//     res.json({ clientSecret: paymentIntent.client_secret });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
   } catch (error) {
     console.error(error);
