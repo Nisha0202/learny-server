@@ -326,6 +326,57 @@ app.put('/api/sessions/:sessionId', async (req, res) => {
       }
     });
 
+
+    //social-login
+    app.post('/api/social-login', async (req, res) => {
+      const { email, username, image, role } = req.body;
+    
+      try {
+        let user = await usersCollection.findOne({ email });
+    
+        if (user) {
+          // Update existing user
+          user.username = username;
+          user.image = image;
+          user.role = role;
+          await usersCollection.updateOne({ email }, { $set: { username, image, role } });
+          res.status(200).json({ message: 'User updated successfully', user });
+        } else {
+          // Create new user
+          const newUser = { email, username, image, role };
+          const result = await usersCollection.insertOne(newUser);
+          res.status(200).json({ message: 'User created successfully', userId: result.insertedId });
+        }
+      } catch (error) {
+        console.error('Error saving user info:', error);
+        res.status(500).json({ message: error.message });
+      }
+    });
+  //   app.post('/api/social-login', async (req, res) => {
+  //     const { email, username, image, role } = req.body;
+  //     try {
+  //         let user = await usersCollection.findOne({ email });
+  //         if (user) {
+  //             // Update existing user
+  //             user.username = username;
+  //             user.image = image;
+  //             user.role = role;
+  //         } else {
+  //             // Create new user
+  //             const user = { email, pass: null, username, image, role };
+  //             const result = await usersCollection.insertOne(user);
+  //             res.status(200).json({ message: 'User created successfully', userId: result.insertedId });
+  //         }
+  //         await user.save();
+  //         res.status(200).json({ message: 'User saved successfully', user });
+  //     } catch (error) {
+  //         res.status(500).json({ message: error.message });
+  //     }
+  // });
+
+
+
+    //reviews
     app.get('/api/review/:id', async (req, res) => {
       const { id } = req.params;
       try {
