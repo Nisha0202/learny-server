@@ -11,15 +11,15 @@
 - **Manage Session and Materials :** Allows students to book sessions, access materials, tutors to create study sessions and upload materials and admin to manage all seamlessly.
 
 ## Technologies Used
-1. Node.js: Server-side JavaScript runtime.
-2. Express.js: Web application framework for Node.js.
-3. MongoDB Atlas: Cloud-hosted MongoDB database.
-4. Firebase Authentication: Used for user authentication (signup, login with email, and Google login).
-5. dotenv: Module to load environment variables from a .env file.
-6. CORS: Middleware to enable Cross-Origin Resource Sharing.
-7. jsonwebtoken (JWT): Used for generating and verifying JSON Web Tokens.
-8. bcrypt: Library for hashing passwords.
-9. Stripe: Payment processing platform.
+1. Node.js
+2. Express.js
+3. MongoDB Atlas
+4. Firebase Authentication
+5. dotenv
+6. CORS
+7. jsonwebtoken (JWT)
+8. bcrypt
+9. Stripe
 
 ## Admin Control
 - **Email:** admin@gmail.com
