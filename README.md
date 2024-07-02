@@ -26,7 +26,7 @@
 - **Password:** Adminn
 
 ## Cloning and Local Setup
-1. Clone the Repository : git clone https://github.com/Nisha0202/haveninn-server.git or download zip
+1. Clone the Repository : git clone https://github.com/Nisha0202/learny-server.git or download zip
 2. Install dependencies using `npm install`
 3. Update MongoDB url to your MongoDB database url
 4. Set a JWT secret key.
